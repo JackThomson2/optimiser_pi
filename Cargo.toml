@@ -6,3 +6,4 @@ authors = ["pi"]
 [dependencies]
 bluetooth-serial-port = "0.5.1"
 mio = "0.6"
+sysfs_gpio = "0.5"
