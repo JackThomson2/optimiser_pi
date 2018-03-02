@@ -14,17 +14,26 @@ use bluetooth_serial_port::{BtProtocol, BtSocket, BtDevice};
 
 fn main() {
     thread::spawn(|| check_bluetooth());
-
-	match blink_led() {
-                Ok(()) => println!("Success!"),
-                Err(err) => println!("We have a blinking problem: {}", err),
-    }
-
+    
     loop {
         let mut input = String::new();
 
         io::stdin().read_line(&mut input)
          .expect("Failed to read line");
+
+         if input.trim().to_uppercase() == "B" {
+            match blink_led(21) {
+                Ok(()) => println!("Success!"),
+                Err(err) => println!("We have a blinking problem: {}", err),
+            }
+         }
+
+         if input.trim().to_uppercase() == "C" {
+            match blink_led(16) {
+                Ok(()) => println!("Success!"),
+                Err(err) => println!("We have a buzzing problem: {}", err),
+            }
+         }
 
         if input.trim().to_uppercase() == "Q" {
             break;
@@ -32,14 +41,14 @@ fn main() {
     }
 }
 
-fn blink_led() -> sysfs_gpio::Result<()> {
-	let my_led = Pin::new(21);
+fn blink_led(pin: u64) -> sysfs_gpio::Result<()> {
+	let my_led = Pin::new(pin);
 
     my_led.with_exported(|| {
         sleep(Duration::from_millis(500));
 		
         my_led.set_direction(Direction::Low)?;
-        for _ in 0..200 {
+        for _ in 0..5 {
             my_led.set_value(0)?;
             sleep(Duration::from_millis(100));
             my_led.set_value(1)?;
@@ -51,26 +60,9 @@ fn blink_led() -> sysfs_gpio::Result<()> {
 }
 
 fn check_bluetooth() {
-	let mut devices: Vec<BtDevice>;
-    let device: &BtDevice;
-    let mut socket: BtSocket;
-	
-	loop {
-		devices = bluetooth_serial_port::scan_devices().unwrap();
-		println!("Devices {}",devices.len());
-	 
-		if devices.len() > 0 {
-			device = &devices[0];
-   
-	        socket = BtSocket::new(BtProtocol::RFCOMM).unwrap();
-            socket.connect(device.addr).unwrap();
-
-            break;
-		}		
-		thread::sleep(Duration::from_millis(4000));
-	}
     
     loop {
+		let mut socket= BtSocket::new(BtProtocol::RFCOMM).unwrap();
 		let mut buffer = [0; 30];
 		let num_bytes_read = socket.read(&mut buffer[..]).unwrap();
 		//let num_bytes_written = socket.write(&buffer[0..num_bytes_read]).unwrap();
