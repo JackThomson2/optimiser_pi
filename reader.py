@@ -19,7 +19,25 @@ class DataStore:
         self.sensor.set_accel_range(int(mpu6050.ACCEL_SCALE_MODIFIER_2G))
         self.recording_time = 0
         self.recording_name = 'NONE'
-    
+
+    # Allows object to be found in an array by name
+    def __eq__(self, other):
+        return self.recording_name == other
+
+    # Easy method for parsing data
+    @staticmethod
+    def store_from_data(input_data):
+        store = DataStore()
+        store.load_data(input_data)
+
+        return store
+
+    # Used to load the object from a previously saved logging session
+    def load_data(self, input_file):
+        self.data = input_file.data
+        self.recording_time = input_file.duration
+        self.recording_name = input_file.name
+
     # This method is used to start the recording of the data from the sensors
     def log_data(self, stop_event):
         start = time.time()

@@ -5,7 +5,8 @@ from reader import DataStore
 
 class record_manager:
     def __init__(self):
-        self.files = store_manager.get_files()
+        self.file_names = store_manager.get_files()
+        self.reader_cache = []
 
     # Used to instantiate a new recording and store it post recording
     def start_new_recording(self, stop_event):
@@ -20,5 +21,16 @@ class record_manager:
 
         recording = reader.get_storage()
 
-        self.files.append(recording)
+        self.reader_cache.append(reader)
         store_manager.store_file(recording)
+
+    # Send record from name
+    def get_send_chunk(self, file_name, location):
+        sender_object = None
+        try:
+            sender_object = self.reader_cache.index(file_name)
+        except:
+            sender_object = store_manager.get_reader_from_name(file_name)
+            self.reader_cache.append(sender_object)
+
+        return sender_object.get_chunk(location)
