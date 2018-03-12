@@ -22,7 +22,7 @@ class DataStore:
 
     # Allows object to be found in an array by name
     def __eq__(self, other):
-        return self.recording_name == other
+        return self.recording_name + '.susp' == other
 
     # Easy method for parsing data
     @staticmethod
@@ -34,9 +34,9 @@ class DataStore:
 
     # Used to load the object from a previously saved logging session
     def load_data(self, input_file):
-        self.data = input_file.data
-        self.recording_time = input_file.duration
-        self.recording_name = input_file.name
+        self.data = input_file['data']
+        self.recording_time = input_file['duration']
+        self.recording_name = input_file['name']
 
     # This method is used to start the recording of the data from the sensors
     def log_data(self, stop_event):

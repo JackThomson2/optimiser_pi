@@ -34,7 +34,7 @@ class record_manager:
         try:
             sender_object = self.reader_cache.index(file_name)
         except:
-            sender_object = store_manager.get_reader_from_name(file_name)
+            sender_object = store_manager.get_reader_from_name(file_name.path)
             self.reader_cache.append(sender_object)
 
         return sender_object.get_chunk(location)

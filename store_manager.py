@@ -26,6 +26,6 @@ class store_manager:
     # Gets the object from a file name
     @staticmethod
     def get_reader_from_name(name):
-        raw_data = json.loads(open(name))
+        raw_data = json.load(open(name))
 
         return DataStore.store_from_data(raw_data)

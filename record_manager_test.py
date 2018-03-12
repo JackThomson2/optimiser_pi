@@ -1,8 +1,10 @@
 import unittest
-from record_manager import record_manager
 import numpy as np
 import threading
 import time
+import random
+from record_manager import record_manager
+from store_manager import store_manager
 
 class RecordManagerTestCase(unittest.TestCase):
 
@@ -22,6 +24,15 @@ class RecordManagerTestCase(unittest.TestCase):
         logging_thread.join()
 
         self.assertEqual(manager.get_cache_size(), start_count + 1)
+
+    def test_load_chunk(self):
+        manager = record_manager()
+        file_list = store_manager.get_files()
+        record = random.choice(file_list)
+        res = manager.get_send_chunk(record, 0)
+
+        self.assertGreater(len(res),0)
+
         
 if __name__ == "__main__":
     unittest.main()
