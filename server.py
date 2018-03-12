@@ -12,10 +12,8 @@ import json
 import math
 from bluetooth import *
 from sensor import mpu6050
+from reader import DataStore
  
-
-CHUNK_SIZE = 50
-
 class LoggerHelper(object):
     def __init__(self, logger, level):
         self.logger = logger
@@ -24,33 +22,6 @@ class LoggerHelper(object):
     def write(self, message):
         if message.rstrip() != "":
             self.logger.log(self.level, message.rstrip())
-
-class DataStore():
-    def __init__(self):
-        self.data = []
-        self.send_buffer = 0
-        self.sensor = mpu6050(0x68)
-        self.sensor.set_accel_range(int(mpu6050.ACCEL_SCALE_MODIFIER_2G))
-    
-    def log_data(self, stop_event):
-        while not stop_event.is_set():
-            self.data.append(self.sensor.get_accel_data())
-            time.sleep(0.05)
-
-    def get_dump(self):
-        return json.dumps(self.data).encode()
-
-    def init_send(self):
-        self.send_buffer = 0
-        return str(int(math.ceil(len(self.data) / CHUNK_SIZE))).encode()
-
-    def get_chunk(self, start=None):
-        start_loc = (self.send_buffer if start is None else start) * CHUNK_SIZE
-        end_loc = CHUNK_SIZE *( self.send_buffer + 1)
-        print(f"Start location {start_loc} end location {end_loc}")
-        send_data = self.data[start_loc:end_loc]
-        self.send_buffer += 1
-        return json.dumps(send_data).encode()
 
 # Main loop
 def main():
@@ -62,12 +33,6 @@ def main():
 
     # Make device visible
     os.system("hciconfig hci0 piscan")
-
-    sensor = mpu6050(0x68)
-
-    data = sensor.get_accel_data()
-
-    print(data)
 
     # Create a new server socket using RFCOMM protocol
     server_sock = BluetoothSocket(RFCOMM)
