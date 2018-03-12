@@ -32,7 +32,8 @@ class record_manager:
     def get_send_chunk(self, file_name, location):
         sender_object = None
         try:
-            sender_object = self.reader_cache.index(file_name)
+            pos = self.reader_cache.index(file_name.name)
+            sender_object = self.reader_cache[pos]
         except:
             sender_object = store_manager.get_reader_from_name(file_name.path)
             self.reader_cache.append(sender_object)

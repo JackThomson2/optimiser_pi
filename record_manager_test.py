@@ -33,6 +33,21 @@ class RecordManagerTestCase(unittest.TestCase):
 
         self.assertGreater(len(res),0)
 
+    # Tests that the code is using the cached objects to save computation
+    def test_load_cache(self):
+        manager = record_manager()
+        file_list = store_manager.get_files()
+        record = random.choice(file_list)
+        res = manager.get_send_chunk(record, 0)
+
+        start = manager.get_cache_size()
+
+        self.assertGreater(len(res),0)
+
+        res = manager.get_send_chunk(record, 1)
+
+        self.assertGreater(len(res),0)
+        self.assertEqual(start, manager.get_cache_size())
         
 if __name__ == "__main__":
     unittest.main()

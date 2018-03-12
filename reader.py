@@ -85,7 +85,6 @@ class DataStore:
     def get_chunk(self, start=None):
         start_loc = (self.send_buffer if start is None else start) * CHUNK_SIZE
         end_loc = CHUNK_SIZE *( self.send_buffer + 1)
-        print(f"Start location {start_loc} end location {end_loc}")
         send_data = self.data[start_loc:end_loc]
         self.send_buffer += 1
         return json.dumps(send_data).encode()
