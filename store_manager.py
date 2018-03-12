@@ -9,7 +9,7 @@ class store_manager:
     # Used to retrieve all the files which have been stored from recordings
     @staticmethod
     def get_files():
-        return [store for store in os.scandir(STORAGE_LOCATION) is store.is_file()]
+        return [entry for entry in os.scandir(STORAGE_LOCATION) if entry.is_file()]
 
     # Used as an easy way to read the number of recordings made
     @staticmethod
@@ -19,10 +19,11 @@ class store_manager:
     # Store a recording to the directory
     @staticmethod
     def store_file(recording):
-        location = STORAGE_LOCATION + '/' + recording.name + '.susp'
+        location = STORAGE_LOCATION + '/' + recording['name'] + '.susp'
         with open(location, 'w') as outfile:
             json.dump(recording, outfile)
 
+    # Gets the object from a file name
     @staticmethod
     def get_reader_from_name(name):
         raw_data = json.loads(open(name))

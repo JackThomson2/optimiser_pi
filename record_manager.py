@@ -8,6 +8,10 @@ class record_manager:
         self.file_names = store_manager.get_files()
         self.reader_cache = []
 
+    # Used for debugging and testing
+    def get_cache_size(self):
+        return len(self.reader_cache)
+
     # Used to instantiate a new recording and store it post recording
     def start_new_recording(self, stop_event):
         reader = DataStore()
