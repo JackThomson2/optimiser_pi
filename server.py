@@ -73,13 +73,13 @@ def main():
                 print(f"Received {data}")
 
                 # Handle the request
-                if data == b"start":
+                if data == b"transaction:start":
                     if logging_thread is None:
                         stop = threading.Event()
                         logging_thread = threading.Thread(target=manager.start_new_recording,args=(stop,))
                         logging_thread.start()
                     response = b"true"
-                elif data == b"stop":
+                elif data == b"transaction:stop":
                     if logging_thread is not None:
                         stop.set()
                         logging_thread.join()
@@ -91,11 +91,6 @@ def main():
                     response = info
                 elif info = get_transaction_init(manager, info):
                     response = info
-                elif data == b"transaction:continue":
-                    response = manager.get_chunk()
-                elif data == "example":
-                    response = b"This is an example"
-                # Insert more here
                 else:
                     response = b"Not supported"
 
