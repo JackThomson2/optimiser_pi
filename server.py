@@ -10,22 +10,13 @@ import time
 import threading
 import json
 import math
+import re
 from bluetooth import *
-from sensor import mpu6050
-from reader import DataStore
- 
-class LoggerHelper(object):
-    def __init__(self, logger, level):
-        self.logger = logger
-        self.level = level
-
-    def write(self, message):
-        if message.rstrip() != "":
-            self.logger.log(self.level, message.rstrip())
+from record_manager import record_manager
 
 # Main loop
 def main():
-    store = DataStore()
+    manager = record_manager()
     
     print("Waiting for bluetooth")
     # We need to wait until Bluetooth init is done
@@ -82,12 +73,10 @@ def main():
                 print(f"Received {data}")
 
                 # Handle the request
-                if data == "bgetop":
-                    response = "op:%s" % ",".join(operations)
-                elif data == b"start":
+                if data == b"start":
                     if logging_thread is None:
                         stop = threading.Event()
-                        logging_thread = threading.Thread(target=store.log_data,args=(stop,))
+                        logging_thread = threading.Thread(target=manager.start_new_recording,args=(stop,))
                         logging_thread.start()
                     response = b"true"
                 elif data == b"stop":
@@ -95,13 +84,15 @@ def main():
                         stop.set()
                         logging_thread.join()
                         logging_thread = None
-                    response = b"true"
-                elif data == b"transaction:init":
-                    response = store.init_send()
+                        response = manager.get_last_data()
+                    else:
+                        response = b"false"
+                elif info = get_transaction_continue(manager, info):
+                    response = info
+                elif info = get_transaction_init(manager, info):
+                    response = info
                 elif data == b"transaction:continue":
-                    response = store.get_chunk()
-                elif data == b"dump":
-                    response = store.get_dump()
+                    response = manager.get_chunk()
                 elif data == "example":
                     response = b"This is an example"
                 # Insert more here
@@ -114,14 +105,36 @@ def main():
             pass
 
         except KeyboardInterrupt:
-
             if client_sock is not None:
                 client_sock.close()
-
             server_sock.close()
-
             print("Server going down")
             break
 
+# Extract the name from the string and get the inital sent string
+def get_transaction_init(manager, text):
+    file_name = re.search(b'filename:(.+?),', text)
+    if not file_name:
+        return False
+
+    name = file_name.group(1)
+
+    return manager.get_initial_request(name)
+
+# Extract the file name then find out which chunk should be returned
+def get_transaction_continue(manager, text):
+    file_name = re.search(b'filename:(.+?),', text)
+    if not file_name:
+        return False
+
+    name = file_name.group(1)
+
+    chunk_numb = re.search(b'chunk:(.+?),', text)
+    if not chunk_numb:
+        return False
+
+    chunk = int(chunk_numb.group(1))
+
+    return manager.get_send_chunk(name, chunk)
 
 main()

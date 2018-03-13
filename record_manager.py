@@ -1,5 +1,6 @@
 import threading
 import time
+import json
 from store_manager import store_manager
 from reader import DataStore
 
@@ -7,6 +8,7 @@ class record_manager:
     def __init__(self):
         self.file_names = store_manager.get_files()
         self.reader_cache = []
+        self.last_record = None
 
     # Used for debugging and testing
     def get_cache_size(self):
@@ -25,11 +27,18 @@ class record_manager:
 
         recording = reader.get_storage()
 
+        self.last_record = reader
         self.reader_cache.append(reader)
         store_manager.store_file(recording)
 
-    # Send record from name
-    def get_send_chunk(self, file_name, location):
+    # Used for a handshake with device after finishing
+    def get_last_data(self):
+        return_data = {'done': True, 'duration': self.last_record.recording_time}
+
+        return json.dumps(return_data).encode()
+
+    # Private function for getting a safe object from cache
+    def get_my_object(self, file_name):
         sender_object = None
         try:
             pos = self.reader_cache.index(file_name.name)
@@ -38,4 +47,14 @@ class record_manager:
             sender_object = store_manager.get_reader_from_name(file_name.path)
             self.reader_cache.append(sender_object)
 
-        return sender_object.get_chunk(location)
+        return sender_object
+
+    # Used for instantiating a request
+    def get_initial_request(self, file_name):
+        found = self.get_my_object(file_name)
+        return found.init_send()
+
+    # Send record from name
+    def get_send_chunk(self, file_name, location):
+        found = self.get_my_object(file_name)
+        return found.get_chunk(location)
