@@ -87,9 +87,9 @@ def main():
                         response = manager.get_last_data()
                     else:
                         response = b"false"
-                elif info = get_transaction_continue(manager, info):
+                elif info = get_transaction_continue(manager, data):
                     response = info
-                elif info = get_transaction_init(manager, info):
+                elif info = get_transaction_init(manager, data):
                     response = info
                 else:
                     response = b"Not supported"
