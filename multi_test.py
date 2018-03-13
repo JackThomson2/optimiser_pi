@@ -1,5 +1,5 @@
 import unittest
-from multi import I2C_controller
+from multi import I2C_controller, PTR_ARR
 
 class MultiTestClass(unittest.TestCase):
 

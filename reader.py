@@ -57,7 +57,7 @@ class DataStore:
         self.controller.I2C_setup(1)
         return_arr = []
         for i in range(1,6):
-            self.controller.I2C_setup(i)
+            self.controller.I2C_setup(PTR_ARR[i])
             try:
                 data = self.sensor.get_accel_data()
                 returnX =  {'x': self.cntr, 'y': data['x']}
