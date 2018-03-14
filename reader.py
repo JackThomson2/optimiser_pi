@@ -6,9 +6,9 @@ import datetime, time
 from bluetooth import *
 from sensor import mpu6050
 from multi import I2C_controller, PTR_ARR
-from record_manager import RANGE
 
 CHUNK_SIZE = 30
+RANGE = int(mpu6050.ACCEL_RANGE_2G)
 
 class DataStore:
     def __init__(self):

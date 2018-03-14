@@ -3,24 +3,23 @@ import time
 import json
 from multi import I2C_controller, PTR_ARR
 from store_manager import store_manager
-from reader import DataStore
+from reader import DataStore, RANGE
 from sensor import mpu6050
 
-RANGE = int(mpu6050.ACCEL_RANGE_2G)
-
 class record_manager:
+    
     def __init__(self):
         self.file_names = store_manager.get_files()
         self.reader_cache = []
-        self.range = 
         self.last_record = None
 
     def setup_sensors(self):
         controller = I2C_controller()
         sensor = mpu6050(0x68)
 
-        for _ in range(1,6)
+        for i in range(1,6):
             controller.I2C_setup(PTR_ARR[i])
+            time.sleep(1)
             sensor.set_accel_range(RANGE)
 
 

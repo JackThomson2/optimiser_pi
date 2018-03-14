@@ -16,7 +16,10 @@ from record_manager import record_manager
 
 # Main loop
 def main():
+    print("Configuring Sensors")
+
     manager = record_manager()
+    manager.setup_sensors()
     
     print("Waiting for bluetooth")
     # We need to wait until Bluetooth init is done
@@ -68,6 +71,9 @@ def main():
 
                 print(f"Received {data}")
 
+                is_continue = get_transaction_continue(manager, data)
+                is_init = get_transaction_init(manager, data)
+
                 # Handle the request
                 if data == b"transaction:start":
                     if logging_thread is None:
@@ -83,9 +89,9 @@ def main():
                         response = manager.get_last_data()
                     else:
                         response = b"false"
-                elif info = get_transaction_continue(manager, data):
-                    response = info
-                elif info = get_transaction_init(manager, data):
+                elif is_continue:
+                    response = is_continue
+                elif is_init:
                     response = info
                 else:
                     response = b"Not supported"
