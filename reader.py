@@ -6,6 +6,7 @@ import datetime, time
 from bluetooth import *
 from sensor import mpu6050
 from multi import I2C_controller, PTR_ARR
+from record_manager import RANGE
 
 CHUNK_SIZE = 30
 
@@ -16,7 +17,6 @@ class DataStore:
         self.cntr = 0
         self.controller = I2C_controller()
         self.sensor = mpu6050(0x68)
-        self.sensor.set_accel_range(int(mpu6050.ACCEL_SCALE_MODIFIER_2G))
         self.recording_time = 0
         self.recording_name = 'NONE'
 
@@ -59,7 +59,7 @@ class DataStore:
         for i in range(1,6):
             self.controller.I2C_setup(PTR_ARR[i])
             try:
-                data = self.sensor.get_accel_data()
+                data = self.sensor.get_accel_data(accel_range=RANGE)
                 returnX =  {'x': self.cntr, 'y': data['x']}
                 returnY =  {'x': self.cntr, 'y': data['y']}
                 returnZ =  {'x': self.cntr, 'y': data['z']}
