@@ -12,7 +12,8 @@ class record_manager:
         self.file_names = store_manager.get_files()
         self.reader_cache = []
         self.last_record = None
-
+    
+    # Ensures all the accelerometers are correctly configured
     def setup_sensors(self):
         controller = I2C_controller()
         sensor = mpu6050(0x68)
@@ -22,6 +23,10 @@ class record_manager:
             time.sleep(1)
             sensor.set_accel_range(RANGE)
 
+    # Used to fisplay all the recordings saved to the device
+    def get_all_data(self):
+        names = [entry.name for entry in self.file_names]
+        return json.dumps(names).encode()
 
     # Used for debugging and testing
     def get_cache_size(self):

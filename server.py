@@ -89,6 +89,8 @@ def main():
                         response = manager.get_last_data()
                     else:
                         response = b"false"
+                elif data == b"transaction:list":
+                    response = manager.get_all_data()
                 elif is_continue:
                     response = is_continue
                 elif is_init:
