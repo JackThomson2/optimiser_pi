@@ -5,6 +5,9 @@ import time
 import random
 from record_manager import record_manager
 from store_manager import store_manager
+from reader import RANGE
+from multi import I2C_controller, PTR_ARR
+from sensor import mpu6050
 
 class RecordManagerTestCase(unittest.TestCase):
 
@@ -48,6 +51,19 @@ class RecordManagerTestCase(unittest.TestCase):
 
         self.assertGreater(len(res),0)
         self.assertEqual(start, manager.get_cache_size())
+
+    # Tests all sensors are configured to the correct range
+    def test_init_sensors(self):
+        manager = record_manager()
+        multi = I2C_controller()
+        sensor = mpu6050(0x68)
+
+        manager.setup_sensors()
+
+        for i in range(1,6):
+            multi.I2C_setup(PTR_ARR[i])
+            self.assertEqual(sensor.read_accel_range(raw=True), RANGE)
+            
         
 if __name__ == "__main__":
     unittest.main()

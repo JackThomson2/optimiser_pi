@@ -23,7 +23,7 @@ def main():
     
     print("Waiting for bluetooth")
     # We need to wait until Bluetooth init is done
-    time.sleep(10)
+    time.sleep(5)
 
     # Make device visible
     os.system("hciconfig hci0 piscan")
@@ -92,7 +92,7 @@ def main():
                 elif is_continue:
                     response = is_continue
                 elif is_init:
-                    response = info
+                    response = is_init
                 else:
                     response = b"Not supported"
 
